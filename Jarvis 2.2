@@ -1,0 +1,91 @@
+import speech_recognition as sr
+import pyttsx3
+import pywhatkit
+import wikipedia
+import pyjokes
+import os
+import subprocess
+import webbrowser
+import datetime
+import time
+
+# Initialize speech recognition and text-to-speech engines
+listener = sr.Recognizer()
+engine = pyttsx3.init()
+
+# Define function to speak text
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Define function to get user input through speech
+def get_input():
+    try:
+        with sr.Microphone() as source:
+            print('Listening...')
+            voice = listener.listen(source)
+            command = listener.recognize_google(voice)
+            command = command.lower()
+            if 'jarvis' in command:
+                command = command.replace('jarvis', '')
+                print(command)
+    except:
+        pass
+    return command
+
+# Define function to execute commands
+def run_jarvis():
+    command = get_input()
+    if 'play' in command:
+        song = command.replace('play', '')
+        speak('Playing ' + song)
+        pywhatkit.playonyt(song)
+    elif 'search' in command:
+        search_term = command.replace('search', '')
+        speak('Searching for ' + search_term)
+        pywhatkit.search(search_term)
+    elif 'wikipedia' in command:
+        search_term = command.replace('wikipedia', '')
+        info = wikipedia.summary(search_term, sentences=1)
+        speak(info)
+    elif 'joke' in command:
+        joke = pyjokes.get_joke()
+        speak(joke)
+    elif 'time' in command:
+        current_time = datetime.datetime.now().strftime('%I:%M %p')
+        speak('The current time is ' + current_time)
+    elif 'date' in command:
+        current_date = datetime.datetime.now().strftime('%A, %B %d %Y')
+        speak('Today is ' + current_date)
+    elif 'open' in command:
+        app = command.replace('open', '')
+        speak('Opening ' + app)
+        os.system('start ' + app)
+    elif 'shutdown' in command:
+        speak('Shutting down the computer')
+        os.system('shutdown /s /t 1')
+    elif 'restart' in command:
+        speak('Restarting the computer')
+        os.system('shutdown /r /t 1')
+    elif 'ip address' in command:
+        ipconfig_process = subprocess.Popen(['ipconfig'], stdout=subprocess.PIPE)
+        output = ipconfig_process.communicate()[0].decode('utf-8')
+        speak('Your IP address is ' + output.split('IPv4 Address. . . . . . . . . . . : ')[1].split('\n')[0])
+    elif 'website' in command:
+        url = command.replace('website', '')
+        speak('Opening ' + url)
+        webbrowser.open(url)
+    elif 'hack' in command:
+        speak('I cannot perform illegal activities such as hacking.')
+        speak('However, I can provide resources on ethical hacking and cybersecurity.')
+        speak('Would you like me to search for more information?')
+        response = get_input()
+        if 'yes' in response:
+            speak('Searching for ethical hacking resources')
+            webbrowser.open('https://www.ethicalhacker.net/')
+            webbrowser.open('https://www.sans.org/')
+            webbrowser.open('https://www.cybrary.it/')
+    elif 'create website' in command:
+        speak('What should be the name of your website?')
+        website_name = get_input()
+        speak('What should be the content of your website?')
